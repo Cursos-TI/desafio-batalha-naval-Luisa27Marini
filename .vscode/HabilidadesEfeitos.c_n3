@@ -1,0 +1,114 @@
+#include <stdio.h>
+
+#define TAM 10
+#define TAM_HAB 5
+
+// Função que imprime o tabuleiro com símbolos visuais
+void imprimirTabuleiro(int tabuleiro[TAM][TAM]) {
+    printf("\nTABULEIRO FINAL:\n");
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
+            if (tabuleiro[i][j] == 0)
+                printf("~ ");  // água
+            else if (tabuleiro[i][j] == 3)
+                printf("N ");  // navio
+            else if (tabuleiro[i][j] == 5)
+                printf("X ");  // área de habilidade
+        }
+        printf("\n");
+    }
+}
+
+// Verifica se a posição está dentro dos limites do tabuleiro
+int dentroDosLimites(int x, int y) {
+    return x >= 0 && x < TAM && y >= 0 && y < TAM;
+}
+
+// Aplica a matriz de habilidade ao tabuleiro com origem no centro
+void aplicarHabilidade(int tabuleiro[TAM][TAM], int habilidade[TAM_HAB][TAM_HAB], int linha, int coluna) {
+    int offset = TAM_HAB / 2;
+
+    for (int i = 0; i < TAM_HAB; i++) {
+        for (int j = 0; j < TAM_HAB; j++) {
+            if (habilidade[i][j] == 1) {
+                int x = linha + i - offset;
+                int y = coluna + j - offset;
+
+                if (dentroDosLimites(x, y) && tabuleiro[x][y] == 0) {
+                    tabuleiro[x][y] = 5;
+                }
+            }
+        }
+    }
+}
+
+// Cria matriz de habilidade em forma de cone (apontando para baixo)
+void criarMatrizCone(int cone[TAM_HAB][TAM_HAB]) {
+    for (int i = 0; i < TAM_HAB; i++)
+        for (int j = 0; j < TAM_HAB; j++)
+            cone[i][j] = 0;
+
+    cone[0][2] = 1;
+    cone[1][1] = cone[1][2] = cone[1][3] = 1;
+    for (int j = 0; j < TAM_HAB; j++)
+        cone[2][j] = 1;
+}
+
+// Cria matriz de habilidade em forma de cruz
+void criarMatrizCruz(int cruz[TAM_HAB][TAM_HAB]) {
+    for (int i = 0; i < TAM_HAB; i++) {
+        for (int j = 0; j < TAM_HAB; j++) {
+            if (i == TAM_HAB / 2 || j == TAM_HAB / 2)
+                cruz[i][j] = 1;
+            else
+                cruz[i][j] = 0;
+        }
+    }
+}
+
+// Cria matriz de habilidade em forma de octaedro (losango)
+void criarMatrizOctaedro(int octaedro[TAM_HAB][TAM_HAB]) {
+    int centro = TAM_HAB / 2;
+
+    for (int i = 0; i < TAM_HAB; i++) {
+        for (int j = 0; j < TAM_HAB; j++) {
+            if (abs(i - centro) + abs(j - centro) <= 2)
+                octaedro[i][j] = 1;
+            else
+                octaedro[i][j] = 0;
+        }
+    }
+}
+
+int main() {
+    int tabuleiro[TAM][TAM] = {0};  // inicializa com água
+
+    // Posicionar navios:
+    // Horizontal
+    tabuleiro[1][1] = tabuleiro[1][2] = tabuleiro[1][3] = 3;
+    // Vertical
+    tabuleiro[4][6] = tabuleiro[5][6] = tabuleiro[6][6] = 3;
+    // Diagonal principal
+    tabuleiro[2][2] = tabuleiro[3][3] = tabuleiro[4][4] = 3;
+    // Diagonal secundária
+    tabuleiro[6][3] = tabuleiro[7][2] = tabuleiro[8][1] = 3;
+
+    // Matrizes das habilidades
+    int cone[TAM_HAB][TAM_HAB];
+    int cruz[TAM_HAB][TAM_HAB];
+    int octaedro[TAM_HAB][TAM_HAB];
+
+    criarMatrizCone(cone);
+    criarMatrizCruz(cruz);
+    criarMatrizOctaedro(octaedro);
+
+    // Aplicar habilidades no tabuleiro em coordenadas fixas
+    aplicarHabilidade(tabuleiro, cone, 1, 5);       // Cone no alto
+    aplicarHabilidade(tabuleiro, cruz, 5, 5);       // Cruz no centro
+    aplicarHabilidade(tabuleiro, octaedro, 7, 7);   // Octaedro na parte inferior
+
+    // Exibir tabuleiro final
+    imprimirTabuleiro(tabuleiro);
+
+    return 0;
+}

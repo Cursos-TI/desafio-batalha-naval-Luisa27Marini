@@ -1,0 +1,74 @@
+#include <stdio.h>
+
+// Tamanho fixo do tabuleiro
+#define TAMANHO_TABULEIRO 10
+// Valor que representa água
+#define AGUA 0
+// Valor que representa navio
+#define NAVIO 3
+// Tamanho fixo dos navios
+#define TAMANHO_NAVIO 3
+
+int main() {
+    // Declaração do tabuleiro (matriz 10x10) e inicialização com 0 (água)
+    int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {0};
+
+    // Coordenadas iniciais definidas no código para os navios
+    int linha_navio_horizontal = 2;
+    int coluna_navio_horizontal = 4;
+
+    int linha_navio_vertical = 5;
+    int coluna_navio_vertical = 7;
+
+    // Verificação se os navios estão dentro dos limites
+    if (coluna_navio_horizontal + TAMANHO_NAVIO <= TAMANHO_TABULEIRO &&
+        linha_navio_vertical + TAMANHO_NAVIO <= TAMANHO_TABULEIRO) {
+
+        // Verificação de sobreposição antes de posicionar o navio horizontal
+        int sobreposicao = 0;
+        for (int i = 0; i < TAMANHO_NAVIO; i++) {
+            if (tabuleiro[linha_navio_horizontal][coluna_navio_horizontal + i] == NAVIO) {
+                sobreposicao = 1;
+                break;
+            }
+        }
+
+        // Verificação de sobreposição antes de posicionar o navio vertical
+        for (int i = 0; i < TAMANHO_NAVIO; i++) {
+            if (tabuleiro[linha_navio_vertical + i][coluna_navio_vertical] == NAVIO) {
+                sobreposicao = 1;
+                break;
+            }
+        }
+
+        // Se não houver sobreposição, posicionar os navios
+        if (!sobreposicao) {
+            // Posiciona navio horizontal
+            for (int i = 0; i < TAMANHO_NAVIO; i++) {
+                tabuleiro[linha_navio_horizontal][coluna_navio_horizontal + i] = NAVIO;
+            }
+
+            // Posiciona navio vertical
+            for (int i = 0; i < TAMANHO_NAVIO; i++) {
+                tabuleiro[linha_navio_vertical + i][coluna_navio_vertical] = NAVIO;
+            }
+
+            // Exibe o tabuleiro
+            printf("Tabuleiro:\n\n");
+            for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
+                for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
+                    printf("%d ", tabuleiro[i][j]);
+                }
+                printf("\n");
+            }
+
+        } else {
+            printf("Erro: Os navios se sobrepõem. Verifique as coordenadas.\n");
+        }
+
+    } else {
+        printf("Erro: Um dos navios excede os limites do tabuleiro.\n");
+    }
+
+    return 0;
+}
